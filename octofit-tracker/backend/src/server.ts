@@ -1,0 +1,48 @@
+import express from 'express';
+import { connectDatabase } from './config/database.js';
+import apiRouter from './routes/api.js';
+
+const app = express();
+const port = 8000;
+const codespaceName = process.env.CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+  ? `https://${codespaceName}-8000.app.github.dev`
+  : 'http://localhost:8000';
+const frontendOrigins = new Set(
+  [
+    'http://localhost:5173',
+    codespaceName ? `https://${codespaceName}-5173.app.github.dev` : null,
+    process.env.FRONTEND_URL?.replace(/\/$/, ''),
+  ].filter((origin): origin is string => Boolean(origin)),
+);
+
+app.use(express.json());
+
+app.use((request, response, next) => {
+  const origin = request.headers.origin;
+  if (!origin || frontendOrigins.has(origin)) response.header('Access-Control-Allow-Origin', origin || 'http://localhost:5173');
+  response.header('Access-Control-Allow-Headers', 'Content-Type');
+  response.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  if (request.method === 'OPTIONS') return response.sendStatus(204);
+  next();
+});
+
+app.get('/api/health', (_request, response) => {
+  response.json({ status: 'ok', service: 'octofit-api', database: 'connected' });
+});
+
+app.use('/api', apiRouter);
+
+app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
+  console.error(error);
+  response.status(500).json({ error: 'Internal server error' });
+});
+
+connectDatabase()
+  .then(() => {
+    app.listen(port, () => console.log(`OctoFit API listening at ${apiBaseUrl}`));
+  })
+  .catch((error) => {
+    console.error('Unable to start API:', error);
+    process.exit(1);
+  });
