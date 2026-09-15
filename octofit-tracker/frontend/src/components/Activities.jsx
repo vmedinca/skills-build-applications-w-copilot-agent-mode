@@ -1,8 +1,12 @@
 import { ResourceState } from './ResourceState.jsx'
 import { useResource } from './useResource.js'
 
+const activitiesEndpoint = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/activities/`
+  : ''
+
 function Activities() {
-  const { data, loading, error } = useResource('activities')
+  const { data, loading, error } = useResource('activities', activitiesEndpoint)
 
   return <section className="page-section">
     <div className="section-heading"><p className="eyebrow">MOMENTUM</p><h2>Recent activity</h2><p>Every session adds a little more signal.</p></div>

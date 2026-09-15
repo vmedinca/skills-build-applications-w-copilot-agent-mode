@@ -16,9 +16,9 @@ export function collectionFrom(payload) {
   return []
 }
 
-export async function getCollection(resource) {
+export async function getCollection(resource, endpoint = `${apiBaseUrl}/${resource}/`) {
   if (!apiBaseUrl) throw new Error('VITE_CODESPACE_NAME is not configured.')
-  const response = await fetch(`${apiBaseUrl}/${resource}/`)
+  const response = await fetch(endpoint)
   if (!response.ok) throw new Error(`Request failed with status ${response.status}.`)
   return collectionFrom(await response.json())
 }

@@ -1,8 +1,12 @@
 import { ResourceState } from './ResourceState.jsx'
 import { useResource } from './useResource.js'
 
+const leaderboardEndpoint = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/leaderboard/`
+  : ''
+
 function Leaderboard() {
-  const { data, loading, error } = useResource('leaderboard')
+  const { data, loading, error } = useResource('leaderboard', leaderboardEndpoint)
 
   return <section className="page-section">
     <div className="section-heading"><p className="eyebrow">THE RACE</p><h2>Leaderboard</h2><p>Small consistency compounds into big numbers.</p></div>

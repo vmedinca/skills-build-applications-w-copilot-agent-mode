@@ -1,8 +1,12 @@
 import { ResourceState } from './ResourceState.jsx'
 import { useResource } from './useResource.js'
 
+const usersEndpoint = import.meta.env.VITE_CODESPACE_NAME
+  ? `https://${import.meta.env.VITE_CODESPACE_NAME}-8000.app.github.dev/api/users/`
+  : ''
+
 function Users() {
-  const { data, loading, error } = useResource('users')
+  const { data, loading, error } = useResource('users', usersEndpoint)
 
   return <section className="page-section">
     <div className="section-heading"><p className="eyebrow">THE CREW</p><h2>People</h2><p>See who is showing up and moving forward.</p></div>
